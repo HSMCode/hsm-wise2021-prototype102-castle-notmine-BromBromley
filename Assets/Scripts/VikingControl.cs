@@ -60,12 +60,13 @@ public class VikingControl : MonoBehaviour
     }
 
     //walking over a red field with deactivated shield
-    private void OnCollisionEnter(Collision other)
-    {
-        if (other.gameObject.tag == "RedField")
-        {
-            _gameManager.GameIsOver();
-            Destroy(this.gameObject);
-        }
-    }
+            private void OnCollisionEnter(Collision collision)
+            {
+            if (collision.gameObject.tag == "RedField")
+                {
+                _gameManager.GameIsOver();
+                Destroy(this.gameObject);
+                }
+            }
+
 }

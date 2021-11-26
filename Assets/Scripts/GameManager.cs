@@ -14,6 +14,7 @@ public class GameManager : MonoBehaviour
      _uiManager = FindObjectOfType<UIManager>(); 
     }
 
+    // activates when the 'Start Game' button is pressed
     public void StartGame()
     {
         _uiManager.StartingGame();
