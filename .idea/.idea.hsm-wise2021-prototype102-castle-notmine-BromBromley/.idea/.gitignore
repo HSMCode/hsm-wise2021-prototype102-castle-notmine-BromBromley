@@ -1,0 +1,13 @@
+﻿# Default ignored files
+/shelf/
+/workspace.xml
+# Rider ignored files
+/.idea.hsm-wise2021-prototype102-castle-notmine-BromBromley.iml
+/projectSettingsUpdater.xml
+/modules.xml
+/contentModel.xml
+# Datasource local storage ignored files
+/../../../../../../../../../../:\Users\Maik Nöbauer\Documents\Uni Mainz\Game Design\hsm-wise2021-prototype102-castle-notmine-BromBromley\.idea\.idea.hsm-wise2021-prototype102-castle-notmine-BromBromley\.idea/dataSources/
+/dataSources.local.xml
+# Editor-based HTTP Client requests
+/httpRequests/
