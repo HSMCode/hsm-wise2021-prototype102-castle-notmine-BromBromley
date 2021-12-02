@@ -5,20 +5,16 @@ using UnityEngine.UI;
 
 public class ShieldBar : MonoBehaviour
 {
-    public Slider shieldBar;
-    public VikingControl _vikingControl;
-
-    //supposedly updates the shield bar, not working yet
-    void Start()
-    {
-        _vikingControl = FindObjectOfType<VikingControl>();
-        shieldBar = GetComponent<Slider>();
-        shieldBar.maxValue = _vikingControl.maxShield;
-        shieldBar.value = _vikingControl.maxShield;
-    }
-
-    public void SetHealth(int hp)
-    {
-        shieldBar.value = hp;
-    }
+    public Slider slider;
+    
+    public void SetMaxShield (int shield)
+   {
+       slider.maxValue = shield;
+       slider.value = shield;
+   }
+   
+   public void SetShield (int shield)
+   {
+       slider.value = shield;
+   }
 }
