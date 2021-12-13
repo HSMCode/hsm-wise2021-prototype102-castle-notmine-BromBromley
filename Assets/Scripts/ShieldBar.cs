@@ -17,4 +17,5 @@ public class ShieldBar : MonoBehaviour
    {
        slider.value = shield;
    }
+
 }
