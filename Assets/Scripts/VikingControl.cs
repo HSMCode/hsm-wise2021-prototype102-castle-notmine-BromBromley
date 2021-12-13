@@ -9,7 +9,11 @@ public class VikingControl : MonoBehaviour
     public int maxShield = 100;
    public int currentShield;
 
+   public int maxHealth = 100;
+   public int currentHealth;
+
    public ShieldBar shieldBar;
+   public HealthBar healthBar;
 
    private bool collision = true;
 
@@ -20,6 +24,9 @@ public class VikingControl : MonoBehaviour
     {
         currentShield = maxShield;
         shieldBar.SetMaxShield(maxShield);
+        
+        currentHealth = maxHealth;
+        healthBar.SetMaxHealth(maxHealth);
 
         _gameManager = FindObjectOfType<GameManager>();
 
@@ -33,8 +40,15 @@ public class VikingControl : MonoBehaviour
          {
              transform.Translate(Vector3.right * moveSpeed * Time.deltaTime);
          }
-        
-     }
+    
+// Kommt hier die Abfrage der Funktionen durch drücken von Space hin?
+        if (Input.GetKeyDown(KeyCode.Space))
+        {
+            Debug.Log("Pressed Spacebar");
+        }
+
+    }
+
 
      private void FixedUpdate()
      {
@@ -48,16 +62,23 @@ public class VikingControl : MonoBehaviour
 
      private void OnCollisionEnter(Collision other)
      {
-         TakeDamage(10);
+         TakeDamageHealth(10);
          Debug.Log("Collision");
          collision = true;
      }
      
-    private void TakeDamage(int damage)
-    {
-        currentShield -= damage;
 
-        shieldBar.SetShield(currentShield);
+    private void TakeDamageShield(int damage)
+    {
+
+            currentShield -= damage;
+            shieldBar.SetShield(currentShield);
+    }
+
+    private void TakeDamageHealth(int damage)
+    {
+        currentHealth -= damage;
+        healthBar.SetHealth(currentHealth);  
     }
 
     public void RestoreShield(int restoreAmount)
@@ -71,6 +92,8 @@ public class VikingControl : MonoBehaviour
         Debug.Log("Exit");
         collision = false;
     }
+
+
 
     //walking over a red field with deactivated shield
          /*   private void OnCollisionEnter(Collision collision)
