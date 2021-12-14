@@ -6,7 +6,7 @@ using UnityEngine.UI;
 
 public class VikingControl : MonoBehaviour
 { 
-    public int maxShield = 100;
+   public int maxShield = 100;
    public int currentShield;
 
    public int maxHealth = 100;
@@ -16,6 +16,9 @@ public class VikingControl : MonoBehaviour
    public HealthBar healthBar;
 
    private bool collision = true;
+   private bool ActiveSpace = false;
+
+   private AudioSource argh;
 
    private int moveSpeed = 3;
    private GameManager _gameManager; 
@@ -31,6 +34,9 @@ public class VikingControl : MonoBehaviour
         _gameManager = FindObjectOfType<GameManager>();
 
         Time.fixedDeltaTime = 0.5f;
+
+        argh = GetComponent<AudioSource>();
+
     }
  
      void Update()
@@ -41,10 +47,16 @@ public class VikingControl : MonoBehaviour
              transform.Translate(Vector3.right * moveSpeed * Time.deltaTime);
          }
     
-// Kommt hier die Abfrage der Funktionen durch drücken von Space hin?
+        // Drücken der Leertaste ermöglicht das Aktivieren von Schild
         if (Input.GetKeyDown(KeyCode.Space))
         {
             Debug.Log("Pressed Spacebar");
+            ActiveSpace = true;
+        }
+        
+        if (Input.GetKeyUp(KeyCode.Space))
+        {
+            ActiveSpace = false;
         }
 
     }
@@ -62,17 +74,26 @@ public class VikingControl : MonoBehaviour
 
      private void OnCollisionEnter(Collision other)
      {
-         TakeDamageHealth(10);
+        collision = true;
+
+        if (ActiveSpace == true)
+        {  
+         TakeDamageShield(10);
          Debug.Log("Collision");
-         collision = true;
+        }
+        else
+        {
+         TakeDamageHealth(10);
+         argh.Play();
+         Debug.Log("Collision");
+        }
      }
      
 
     private void TakeDamageShield(int damage)
     {
-
-            currentShield -= damage;
-            shieldBar.SetShield(currentShield);
+        currentShield -= damage;
+        shieldBar.SetShield(currentShield);
     }
 
     private void TakeDamageHealth(int damage)
