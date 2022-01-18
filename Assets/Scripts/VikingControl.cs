@@ -17,13 +17,12 @@ public class VikingControl : MonoBehaviour
 
    private bool redField = false;
    private bool blueField = false;
-    private bool greenField = false;
-    private bool ActiveSpace = false;
+   private bool greenField = false;
+   private bool ActiveSpace = false;
 
-   private AudioSource argh;
+   private AudioSource audio;
 
    private int moveSpeed = 3;
-   private GameManager _gameManager; 
 
     void Start()
     {
@@ -33,23 +32,17 @@ public class VikingControl : MonoBehaviour
         currentHealth = maxHealth;
         healthBar.SetMaxHealth(maxHealth);
 
-        _gameManager = FindObjectOfType<GameManager>();
-
         Time.fixedDeltaTime = 0.1f;
 
-        argh = GetComponent<AudioSource>();
+        audio = GetComponent<AudioSource>();
 
     }
  
-     void Update()
-     {
-         // automatic movement of the player character
-        if (_gameManager.inputActive == true)
-        {
-             transform.Translate(Vector3.right * moveSpeed * Time.deltaTime);
-        }
+    void Update()
+    {
+        transform.Translate(Vector3.right * moveSpeed * Time.deltaTime);
     
-        // Drücken der Leertaste ermöglicht das Aktivieren von Schild
+        // Activate Shield while holding Spacebar
         if (Input.GetKeyDown(KeyCode.Space))
         {
             Debug.Log("Pressed Spacebar");
@@ -65,15 +58,12 @@ public class VikingControl : MonoBehaviour
         if (currentHealth < 1)
         {
             Debug.Log("You lost");
-            _gameManager.GameIsOver();
             Destroy(this.gameObject);
         }
+    }
 
-     }
-
-
-     private void FixedUpdate()
-     {
+    private void FixedUpdate()
+    {
         if (ActiveSpace == true)
         {
             DrainShield(1);
@@ -92,7 +82,7 @@ public class VikingControl : MonoBehaviour
             if (redField == true)
             {
                 DrainHealth(3);
-                argh.Play();
+                audio.Play();
                 Debug.Log("Red Field");
             }
 
@@ -101,21 +91,11 @@ public class VikingControl : MonoBehaviour
                 RestoreHealth(1);
                 Debug.Log("Green Field");
             }
-
-
         }
+    }
 
-        
-
-
-     }
-
-
-    
-
-
-     private void OnCollisionEnter(Collision col)
-     {
+    private void OnCollisionEnter(Collision col)
+    {
         if (col.gameObject.tag == "RedField")
         {
             redField = true;
@@ -176,17 +156,4 @@ public class VikingControl : MonoBehaviour
             greenField = false;
         }
     }
-
-
-
-    //walking over a red field with deactivated shield
-         /*   private void OnCollisionEnter(Collision collision)
-            {
-            if (collision.gameObject.tag == "RedField")
-                {
-                _gameManager.GameIsOver();
-                Destroy(this.gameObject);
-                }
-            } */
-
 }
