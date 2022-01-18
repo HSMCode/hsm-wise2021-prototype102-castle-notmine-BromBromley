@@ -15,8 +15,10 @@ public class VikingControl : MonoBehaviour
    public ShieldBar shieldBar;
    public HealthBar healthBar;
 
-   private bool collision = true;
-   private bool ActiveSpace = false;
+   private bool redField = false;
+   private bool blueField = false;
+    private bool greenField = false;
+    private bool ActiveSpace = false;
 
    private AudioSource argh;
 
@@ -33,7 +35,7 @@ public class VikingControl : MonoBehaviour
 
         _gameManager = FindObjectOfType<GameManager>();
 
-        Time.fixedDeltaTime = 0.5f;
+        Time.fixedDeltaTime = 0.1f;
 
         argh = GetComponent<AudioSource>();
 
@@ -43,9 +45,9 @@ public class VikingControl : MonoBehaviour
      {
          // automatic movement of the player character
         if (_gameManager.inputActive == true)
-         {
+        {
              transform.Translate(Vector3.right * moveSpeed * Time.deltaTime);
-         }
+        }
     
         // Drücken der Leertaste ermöglicht das Aktivieren von Schild
         if (Input.GetKeyDown(KeyCode.Space))
@@ -59,44 +61,83 @@ public class VikingControl : MonoBehaviour
             ActiveSpace = false;
         }
 
-    }
+
+        if (currentHealth < 1)
+        {
+            Debug.Log("You lost");
+            _gameManager.GameIsOver();
+            Destroy(this.gameObject);
+        }
+
+     }
 
 
      private void FixedUpdate()
      {
-         if (collision == false)
-         {
-             RestoreShield(1);
-             Debug.Log("No Collision");
-         }
-     }
-
-
-     private void OnCollisionEnter(Collision other)
-     {
-        collision = true;
-
         if (ActiveSpace == true)
-        {  
-         TakeDamageShield(10);
-         Debug.Log("Collision");
+        {
+            DrainShield(1);
         }
+
         else
         {
-         TakeDamageHealth(10);
-         argh.Play();
-         Debug.Log("Collision");
-        }
-     }
-     
+            RestoreShield(1);
 
-    private void TakeDamageShield(int damage)
-    {
-        currentShield -= damage;
-        shieldBar.SetShield(currentShield);
+            if (blueField == true)
+            {
+                RestoreShield(2);
+                Debug.Log("Blue Field");
+            }
+
+            if (redField == true)
+            {
+                DrainHealth(3);
+                argh.Play();
+                Debug.Log("Red Field");
+            }
+
+            if (greenField == true)
+            {
+                RestoreHealth(1);
+                Debug.Log("Green Field");
+            }
+
+
+        }
+
+        
+
+
+     }
+
+
+    
+
+
+     private void OnCollisionEnter(Collision col)
+     {
+        if (col.gameObject.tag == "RedField")
+        {
+            redField = true;
+        }
+        if (col.gameObject.tag == "BlueField")
+        {
+            blueField = true;
+        }
+        if (col.gameObject.tag == "GreenField")
+        {
+            greenField = true;
+        }
     }
 
-    private void TakeDamageHealth(int damage)
+
+    private void RestoreHealth(int amount)
+    {
+        currentHealth += amount;
+        healthBar.SetHealth(currentHealth);
+    }
+
+    private void DrainHealth(int damage)
     {
         currentHealth -= damage;
         healthBar.SetHealth(currentHealth);  
@@ -104,14 +145,36 @@ public class VikingControl : MonoBehaviour
 
     public void RestoreShield(int restoreAmount)
     {
-        currentShield += restoreAmount;
-        shieldBar.SetShield(currentShield);
+        if (currentShield < maxShield)
+        {
+            currentShield += restoreAmount;
+            shieldBar.SetShield(currentShield);
+        }        
     }
 
-    private void OnCollisionExit(Collision other)
+    public void DrainShield(int drainAmount)
     {
-        Debug.Log("Exit");
-        collision = false;
+        if (currentShield > 0)
+        {
+            currentShield -= drainAmount;
+            shieldBar.SetShield(currentShield);
+        }
+    }
+
+    private void OnCollisionExit(Collision col)
+    {
+        if (col.gameObject.tag == "RedField")
+        {
+            redField = false;
+        }
+        if (col.gameObject.tag == "BlueField")
+        {
+            blueField = false;
+        }
+        if (col.gameObject.tag == "GreenField")
+        {
+            greenField = false;
+        }
     }
 
 
