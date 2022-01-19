@@ -45,7 +45,6 @@ public class VikingControl : MonoBehaviour
         // Activate Shield while holding Spacebar
         if (Input.GetKeyDown(KeyCode.Space))
         {
-            Debug.Log("Pressed Spacebar");
             ActiveSpace = true;
         }
         
@@ -54,11 +53,9 @@ public class VikingControl : MonoBehaviour
             ActiveSpace = false;
         }
 
-
         if (currentHealth < 1)
         {
-            Debug.Log("You lost");
-            Destroy(this.gameObject);
+            FindObjectOfType<GameManagerScript>().GameOver();
         }
     }
 
@@ -76,20 +73,20 @@ public class VikingControl : MonoBehaviour
             if (blueField == true)
             {
                 RestoreShield(2);
-                Debug.Log("Blue Field");
             }
 
             if (redField == true)
             {
                 DrainHealth(3);
-                audio.Play();
-                Debug.Log("Red Field");
+                if (!audio.isPlaying)
+                {
+                    audio.Play();
+                }
             }
 
             if (greenField == true)
             {
                 RestoreHealth(1);
-                Debug.Log("Green Field");
             }
         }
     }

@@ -22,7 +22,7 @@ public class Score : MonoBehaviour
  
         if (timer > 1f)
         {
-            AddScore(5);
+            AddScore(1);
             timer = 0;
         }
     }
