@@ -40,7 +40,7 @@ public class VikingControl : MonoBehaviour
  
     void Update()
     {
-        transform.Translate(Vector3.right * moveSpeed * Time.deltaTime);
+        transform.Translate(Vector3.forward * moveSpeed * Time.deltaTime);
     
         // Activate Shield while holding Spacebar
         if (Input.GetKeyDown(KeyCode.Space))
