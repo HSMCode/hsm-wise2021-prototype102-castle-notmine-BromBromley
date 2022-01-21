@@ -6,23 +6,24 @@ using UnityEngine.UI;
 
 public class VikingControl : MonoBehaviour
 { 
-   public int maxShield = 100;
-   public int currentShield;
+    public int maxShield = 100;
+    public int currentShield;
 
-   public int maxHealth = 100;
-   public int currentHealth;
+    public int maxHealth = 100;
+    public int currentHealth;
 
-   public ShieldBar shieldBar;
-   public HealthBar healthBar;
+    public ShieldBar shieldBar;
+    public HealthBar healthBar;
 
-   private bool redField = false;
-   private bool blueField = false;
-   private bool greenField = false;
-   private bool ActiveSpace = false;
+    private bool redField = false;
+    private bool blueField = false;
+    private bool greenField = false;
+    private bool ActiveSpace = false;
 
-   private AudioSource audio;
+    private AudioSource audio;
+    private Animator animator;
 
-   private int moveSpeed = 3;
+    private int moveSpeed = 3;
 
     void Start()
     {
@@ -36,6 +37,8 @@ public class VikingControl : MonoBehaviour
 
         audio = GetComponent<AudioSource>();
 
+        animator = GetComponent<Animator>();
+
     }
  
     void Update()
@@ -46,11 +49,15 @@ public class VikingControl : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.Space))
         {
             ActiveSpace = true;
+
+            animator.Play("ShieldUp", 0, 0.25f);
+
         }
         
         if (Input.GetKeyUp(KeyCode.Space))
         {
             ActiveSpace = false;
+            animator.Play("Walk", 0, 0.25f);
         }
 
         if (currentHealth < 1)
