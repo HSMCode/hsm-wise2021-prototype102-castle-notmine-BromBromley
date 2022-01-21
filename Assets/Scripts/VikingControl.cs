@@ -23,6 +23,9 @@ public class VikingControl : MonoBehaviour
     private AudioSource audio;
     private Animator animator;
 
+    private ParticleSystem shieldParticle1System;
+    private ParticleSystem shieldParticle2System;
+
     private int moveSpeed = 3;
 
     void Start()
@@ -33,11 +36,14 @@ public class VikingControl : MonoBehaviour
         currentHealth = maxHealth;
         healthBar.SetMaxHealth(maxHealth);
 
-        Time.fixedDeltaTime = 0.1f;
+        Time.fixedDeltaTime = 0.075f;
 
         audio = GetComponent<AudioSource>();
 
         animator = GetComponent<Animator>();
+
+        shieldParticle1System = GameObject.Find("ShieldParticles01").GetComponent<ParticleSystem>();
+        shieldParticle2System = GameObject.Find("ShieldParticles02").GetComponent<ParticleSystem>();
 
     }
  
@@ -48,20 +54,17 @@ public class VikingControl : MonoBehaviour
         // Activate Shield while holding Spacebar
         if (Input.GetKeyDown(KeyCode.Space))
         {
-            ActiveSpace = true;
-
-            animator.Play("ShieldUp", 0, 0.25f);
-
+            ActivateShield();
         }
         
         if (Input.GetKeyUp(KeyCode.Space))
         {
-            ActiveSpace = false;
-            animator.Play("Walk", 0, 0.25f);
+            DeactivateShield();
         }
 
         if (currentHealth < 1)
         {
+            GameOverMessage.reachedMidgard = false;
             FindObjectOfType<GameManagerScript>().GameOver();
         }
     }
@@ -71,6 +74,12 @@ public class VikingControl : MonoBehaviour
         if (ActiveSpace == true)
         {
             DrainShield(1);
+
+            if (currentShield < 1)
+            {
+                DeactivateShield();
+            }
+
         }
 
         else
@@ -112,6 +121,30 @@ public class VikingControl : MonoBehaviour
         {
             greenField = true;
         }
+        if (col.gameObject.tag == "YellowField")
+        {
+            greenField = true;
+            blueField = true;
+            GameOverMessage.reachedMidgard = true;
+            FindObjectOfType<GameManagerScript>().GameOver();
+        }
+    }
+
+
+    private void ActivateShield()
+    {
+        ActiveSpace = true;
+        animator.Play("ShieldUp", 0, 0.25f);
+        shieldParticle1System.Play();
+        shieldParticle2System.Play();
+    }
+
+    private void DeactivateShield()
+    {
+        ActiveSpace = false;
+        animator.Play("Walk", 0, 0.25f);
+        shieldParticle1System.Stop();
+        shieldParticle2System.Stop();
     }
 
 
