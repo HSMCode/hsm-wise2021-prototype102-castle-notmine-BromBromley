@@ -26,6 +26,9 @@ public class VikingControl : MonoBehaviour
     private ParticleSystem shieldParticle1System;
     private ParticleSystem shieldParticle2System;
 
+    private ParticleSystem blueFieldParticleSystem;
+    private ParticleSystem greenFieldParticleSystem;
+
     private int moveSpeed = 3;
 
     void Start()
@@ -39,12 +42,12 @@ public class VikingControl : MonoBehaviour
         Time.fixedDeltaTime = 0.075f;
 
         audio = GetComponent<AudioSource>();
-
         animator = GetComponent<Animator>();
 
         shieldParticle1System = GameObject.Find("ShieldParticles01").GetComponent<ParticleSystem>();
         shieldParticle2System = GameObject.Find("ShieldParticles02").GetComponent<ParticleSystem>();
-
+        blueFieldParticleSystem = GameObject.Find("BlueFieldParticles").GetComponent<ParticleSystem>();
+        greenFieldParticleSystem = GameObject.Find("GreenFieldParticles").GetComponent<ParticleSystem>();
     }
  
     void Update()
@@ -79,7 +82,6 @@ public class VikingControl : MonoBehaviour
             {
                 DeactivateShield();
             }
-
         }
 
         else
@@ -115,10 +117,12 @@ public class VikingControl : MonoBehaviour
         }
         if (col.gameObject.tag == "BlueField")
         {
+            blueFieldParticleSystem.Play();
             blueField = true;
         }
         if (col.gameObject.tag == "GreenField")
         {
+            greenFieldParticleSystem.Play();
             greenField = true;
         }
         if (col.gameObject.tag == "YellowField")
@@ -165,7 +169,7 @@ public class VikingControl : MonoBehaviour
         if (currentShield < maxShield)
         {
             currentShield += restoreAmount;
-            shieldBar.SetShield(currentShield);
+            shieldBar.SetShield(currentShield);       
         }        
     }
 
@@ -187,10 +191,12 @@ public class VikingControl : MonoBehaviour
         if (col.gameObject.tag == "BlueField")
         {
             blueField = false;
+            blueFieldParticleSystem.Stop();
         }
         if (col.gameObject.tag == "GreenField")
         {
             greenField = false;
+            greenFieldParticleSystem.Stop();
         }
     }
 }
