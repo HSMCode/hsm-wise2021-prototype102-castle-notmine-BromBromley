@@ -6,22 +6,30 @@ using UnityEngine.UI;
 
 public class VikingControl : MonoBehaviour
 { 
-   public int maxShield = 100;
-   public int currentShield;
+    public int maxShield = 100;
+    public int currentShield;
 
-   public int maxHealth = 100;
-   public int currentHealth;
+    public int maxHealth = 100;
+    public int currentHealth;
 
-   public ShieldBar shieldBar;
-   public HealthBar healthBar;
+    public ShieldBar shieldBar;
+    public HealthBar healthBar;
 
-   private bool collision = true;
-   private bool ActiveSpace = false;
+    private bool redField = false;
+    private bool blueField = false;
+    private bool greenField = false;
+    private bool ActiveSpace = false;
 
-   private AudioSource argh;
+    private AudioSource audio;
+    private Animator animator;
 
-   private int moveSpeed = 3;
-   private GameManager _gameManager; 
+    private ParticleSystem shieldParticle1System;
+    private ParticleSystem shieldParticle2System;
+
+    private ParticleSystem blueFieldParticleSystem;
+    private ParticleSystem greenFieldParticleSystem;
+
+    private int moveSpeed = 3;
 
     void Start()
     {
@@ -31,72 +39,126 @@ public class VikingControl : MonoBehaviour
         currentHealth = maxHealth;
         healthBar.SetMaxHealth(maxHealth);
 
-        _gameManager = FindObjectOfType<GameManager>();
+        Time.fixedDeltaTime = 0.075f;
 
-        Time.fixedDeltaTime = 0.5f;
+        audio = GetComponent<AudioSource>();
+        animator = GetComponent<Animator>();
 
-        argh = GetComponent<AudioSource>();
-
+        shieldParticle1System = GameObject.Find("ShieldParticles01").GetComponent<ParticleSystem>();
+        shieldParticle2System = GameObject.Find("ShieldParticles02").GetComponent<ParticleSystem>();
+        blueFieldParticleSystem = GameObject.Find("BlueFieldParticles").GetComponent<ParticleSystem>();
+        greenFieldParticleSystem = GameObject.Find("GreenFieldParticles").GetComponent<ParticleSystem>();
     }
  
-     void Update()
-     {
-         // automatic movement of the player character
-        if (_gameManager.inputActive == true)
-         {
-             transform.Translate(Vector3.right * moveSpeed * Time.deltaTime);
-         }
+    void Update()
+    {
+        transform.Translate(Vector3.forward * moveSpeed * Time.deltaTime);
     
-        // Drücken der Leertaste ermöglicht das Aktivieren von Schild
+        // Activate Shield while holding Spacebar
         if (Input.GetKeyDown(KeyCode.Space))
         {
-            Debug.Log("Pressed Spacebar");
-            ActiveSpace = true;
+            ActivateShield();
         }
         
         if (Input.GetKeyUp(KeyCode.Space))
         {
-            ActiveSpace = false;
+            DeactivateShield();
         }
 
+        if (currentHealth < 1)
+        {
+            GameOverMessage.reachedMidgard = false;
+            FindObjectOfType<GameManagerScript>().GameOver();
+        }
     }
 
-
-     private void FixedUpdate()
-     {
-         if (collision == false)
-         {
-             RestoreShield(1);
-             Debug.Log("No Collision");
-         }
-     }
-
-
-     private void OnCollisionEnter(Collision other)
-     {
-        collision = true;
-
+    private void FixedUpdate()
+    {
         if (ActiveSpace == true)
-        {  
-         TakeDamageShield(10);
-         Debug.Log("Collision");
+        {
+            DrainShield(1);
+
+            if (currentShield < 1)
+            {
+                DeactivateShield();
+            }
         }
+
         else
         {
-         TakeDamageHealth(10);
-         argh.Play();
-         Debug.Log("Collision");
-        }
-     }
-     
+            RestoreShield(1);
 
-    private void TakeDamageShield(int damage)
-    {
-        currentShield -= damage;
-        shieldBar.SetShield(currentShield);
+            if (blueField == true)
+            {
+                RestoreShield(2);
+            }
+
+            if (redField == true)
+            {
+                DrainHealth(3);
+                if (!audio.isPlaying)
+                {
+                    audio.Play();
+                }
+            }
+
+            if (greenField == true)
+            {
+                RestoreHealth(1);
+            }
+        }
     }
 
-    private void TakeDamageHealth(int damage)
+    private void OnCollisionEnter(Collision col)
+    {
+        if (col.gameObject.tag == "RedField")
+        {
+            redField = true;
+        }
+        if (col.gameObject.tag == "BlueField")
+        {
+            blueFieldParticleSystem.Play();
+            blueField = true;
+        }
+        if (col.gameObject.tag == "GreenField")
+        {
+            greenFieldParticleSystem.Play();
+            greenField = true;
+        }
+        if (col.gameObject.tag == "YellowField")
+        {
+            greenField = true;
+            blueField = true;
+            GameOverMessage.reachedMidgard = true;
+            FindObjectOfType<GameManagerScript>().GameOver();
+        }
+    }
+
+
+    private void ActivateShield()
+    {
+        ActiveSpace = true;
+        animator.Play("ShieldUp", 0, 0.25f);
+        shieldParticle1System.Play();
+        shieldParticle2System.Play();
+    }
+
+    private void DeactivateShield()
+    {
+        ActiveSpace = false;
+        animator.Play("Walk", 0, 0.25f);
+        shieldParticle1System.Stop();
+        shieldParticle2System.Stop();
+    }
+
+
+    private void RestoreHealth(int amount)
+    {
+        currentHealth += amount;
+        healthBar.SetHealth(currentHealth);
+    }
+
+    private void DrainHealth(int damage)
     {
         currentHealth -= damage;
         healthBar.SetHealth(currentHealth);  
@@ -104,26 +166,37 @@ public class VikingControl : MonoBehaviour
 
     public void RestoreShield(int restoreAmount)
     {
-        currentShield += restoreAmount;
-        shieldBar.SetShield(currentShield);
+        if (currentShield < maxShield)
+        {
+            currentShield += restoreAmount;
+            shieldBar.SetShield(currentShield);       
+        }        
     }
 
-    private void OnCollisionExit(Collision other)
+    public void DrainShield(int drainAmount)
     {
-        Debug.Log("Exit");
-        collision = false;
+        if (currentShield > 0)
+        {
+            currentShield -= drainAmount;
+            shieldBar.SetShield(currentShield);
+        }
     }
 
-
-
-    //walking over a red field with deactivated shield
-         /*   private void OnCollisionEnter(Collision collision)
-            {
-            if (collision.gameObject.tag == "RedField")
-                {
-                _gameManager.GameIsOver();
-                Destroy(this.gameObject);
-                }
-            } */
-
+    private void OnCollisionExit(Collision col)
+    {
+        if (col.gameObject.tag == "RedField")
+        {
+            redField = false;
+        }
+        if (col.gameObject.tag == "BlueField")
+        {
+            blueField = false;
+            blueFieldParticleSystem.Stop();
+        }
+        if (col.gameObject.tag == "GreenField")
+        {
+            greenField = false;
+            greenFieldParticleSystem.Stop();
+        }
+    }
 }
